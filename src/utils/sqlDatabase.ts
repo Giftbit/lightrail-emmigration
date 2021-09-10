@@ -1,7 +1,7 @@
 import knex = require("knex");
 import {askPassword} from "./commandLineInput";
 
-export async function connectToDatabase(): Promise<knex.Knex> {
+export async function connectToSqlDatabase(): Promise<knex.Knex> {
     const question = "Database readonly password? "
     const pw = await askPassword(question);
     try {
@@ -13,7 +13,7 @@ export async function connectToDatabase(): Promise<knex.Knex> {
         return knex;
     } catch (e) {
         console.log("An error occurred while connecting to the database. Please confirm you're entering the correct password, that your connected to the VPN, and tunneled into the database.");
-        return connectToDatabase();
+        return connectToSqlDatabase();
     }
 }
 

@@ -11,6 +11,7 @@ npm-debug.log*
 
 # Build output
 build/
+data/
 
 # Environment variables for testing
 .env
