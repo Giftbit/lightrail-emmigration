@@ -1,7 +1,7 @@
 import * as dynameh from "dynameh";
-import {writeDownload} from "../utils/fileUtils";
 import {dynamodb} from "../utils/dynamodb";
 import {findDynamoTableName} from "../utils/findDynamoTable";
+import {writeFile} from "../utils/fileUtils";
 
 interface AccountObject {
     pk: string;
@@ -46,7 +46,7 @@ export async function downloadEdhi(accountId: string): Promise<void> {
     const accountTestQueryReq = dynameh.requestBuilder.buildQueryInput(tableSchema, `Account/${accountId}-TEST`);
     const accountTestRes: AccountObject[] = await dynameh.queryHelper.queryAll(dynamodb, accountTestQueryReq);
 
-    await writeDownload(accountId, `edhi`, [
+    await writeFile(accountId, "download", `edhi`, [
         ...accountRes,
         ...userRes,
         ...accountTestRes

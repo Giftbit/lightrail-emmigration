@@ -1,6 +1,7 @@
 import {download} from "./download";
 import {decrypt} from "./decrypt";
 import {encrypt} from "./encrypt";
+import {upload} from "./upload";
 
 main();
 
@@ -17,6 +18,9 @@ async function main(): Promise<void> {
             break;
         case "encrypt":
             await encrypt(stripTest(userId));
+            break;
+        case "upload":
+            await upload(stripTest(userId));
             break;
         default:
             throw new Error(`Unknown command '${command}'`);

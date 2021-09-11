@@ -1,5 +1,9 @@
 import {askPassword, askQuestion} from "../utils/commandLineInput";
-import {listDownloads, readDownload, writeDecrypt, writeEncrypt} from "../utils/fileUtils";
+import {
+    listFiles,
+    readFile,
+    writeFile
+} from "../utils/fileUtils";
 import {decryptStoredItem, StoredItem} from "../utils/StoredItem";
 import {decryptCode} from "../utils/rothschildCrypto";
 
@@ -14,26 +18,26 @@ export async function decrypt(accountId: string): Promise<void> {
 async function decryptKvs(accountId: string, kmsKeyId: string): Promise<void> {
     console.log("Decrypting KVS");
 
-    const storedItems: StoredItem[] = await readDownload(accountId, "kvs");
+    const storedItems: StoredItem[] = await readFile(accountId, "download", "kvs");
     for (let i = 0; i < storedItems.length; i++) {
         if (storedItems[i].encrypted) {
             storedItems[i] = await decryptStoredItem(storedItems[i], kmsKeyId);
         }
     }
-    await writeDecrypt(accountId, "kvs", storedItems);
+    await writeFile(accountId, "decrypt", "kvs", storedItems);
 }
 
 async function decryptRothschild(accountId: string, encryptionSecret: string): Promise<void> {
     console.log("Decrypting Rothschild");
 
-    const filenames = await listDownloads(accountId, "rothschild-Values");
+    const filenames = await listFiles(accountId, "download", "rothschild-Values");
     for (const filename of filenames) {
-        const values: any[] = await readDownload(accountId, filename);
+        const values: any[] = await readFile(accountId, "download", filename);
         for (const value of values) {
             if (value.codeEncrypted) {
                 value.codeDecrypted = decryptCode(value.codeEncrypted, encryptionSecret);
             }
         }
-        await writeDecrypt(accountId, filename, values);
+        await writeFile(accountId, "decrypt", filename, values);
     }
 }
