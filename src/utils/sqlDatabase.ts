@@ -2,10 +2,11 @@ import knex = require("knex");
 import {askPassword} from "./commandLineInput";
 
 export async function connectToSqlDatabase(): Promise<knex.Knex> {
-    const question = "Database readonly password? "
+    const username = "readonly";
+    const question = `Database ${username} password? `
     const pw = await askPassword(question);
     try {
-        const knex = await getKnexRead(pw);
+        const knex = await getKnex(username, pw, "localhost", "3306");
         // meaningless query to test connection
         await knex("Programs")
             .select("*")
@@ -15,10 +16,6 @@ export async function connectToSqlDatabase(): Promise<knex.Knex> {
         console.log("An error occurred while connecting to the database. Please confirm you're entering the correct password, that your connected to the VPN, and tunneled into the database.");
         return connectToSqlDatabase();
     }
-}
-
-export function getKnexRead(password: string): knex.Knex {
-    return getKnex("readonly", password, "localhost", "3306");
 }
 
 function getKnex(username: string, password: string, endpoint: string, port: string): knex.Knex {

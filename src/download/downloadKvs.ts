@@ -4,6 +4,8 @@ import {dynamodb} from "../utils/dynamodb";
 import {findDynamoTableName} from "../utils/findDynamoTable";
 
 export async function downloadKvs(accountId: string): Promise<void> {
+    console.log("Downloading KVS");
+
     const tableSchema: dynameh.TableSchema = {
         tableName: await findDynamoTableName(/Kvs-Table/),
         partitionKeyField: "giftbitUserId",

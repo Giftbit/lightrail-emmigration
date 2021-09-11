@@ -10,6 +10,8 @@ interface AccountObject {
 }
 
 export async function downloadEdhi(accountId: string): Promise<void> {
+    console.log("Downloading Edhi");
+
     const tableName = await findDynamoTableName(/-Edhi-ObjectTable-/);
     const tableSchema: dynameh.TableSchema = {
         tableName: tableName,
@@ -34,7 +36,6 @@ export async function downloadEdhi(accountId: string): Promise<void> {
 
     const accountQueryReq = dynameh.requestBuilder.buildQueryInput(tableSchema, `Account/${accountId}`);
     const accountRes: AccountObject[] = await dynameh.queryHelper.queryAll(dynamodb, accountQueryReq);
-    console.log(accountRes.length, "account objects");
 
     const userRes = (await Promise.all(getAccountUserIds(accountRes)
         .map(userId => {
@@ -44,7 +45,6 @@ export async function downloadEdhi(accountId: string): Promise<void> {
 
     const accountTestQueryReq = dynameh.requestBuilder.buildQueryInput(tableSchema, `Account/${accountId}-TEST`);
     const accountTestRes: AccountObject[] = await dynameh.queryHelper.queryAll(dynamodb, accountTestQueryReq);
-    console.log(accountTestRes.length, "account test objects");
 
     await writeImport(accountId, `edhi`, [
         ...accountRes,
