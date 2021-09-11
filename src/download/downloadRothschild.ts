@@ -1,6 +1,6 @@
 import knex = require("knex");
 import {connectToSqlDatabase} from "../utils/sqlDatabase";
-import {writeImport} from "../utils/fileUtils";
+import {writeDownload} from "../utils/fileUtils";
 
 export async function downloadRothschild(accountId: string): Promise<void> {
     console.log("Downloading Rothschild");
@@ -37,12 +37,12 @@ async function naiveSqlDownload(accountId: string, knex: knex.Knex, tableName: s
     const res = await knex(tableName)
         .select()
         .where({userId: accountId});
-    await writeImport(accountId, `rothschild-${tableName}`, res);
+    await writeDownload(accountId, `rothschild-${tableName}-live`, res);
 
     const resTest = await knex(tableName)
         .select()
         .where({userId: accountId + "-TEST"});
-    await writeImport(accountId, `rothschild-${tableName}-test`, resTest);
+    await writeDownload(accountId, `rothschild-${tableName}-test`, resTest);
 }
 
 async function pagedSqlDownload(accountId: string, knex: knex.Knex, tableName: string, idField = "id"): Promise<void> {
@@ -55,7 +55,7 @@ async function pagedSqlDownload(accountId: string, knex: knex.Knex, tableName: s
         .where({userId: accountId})
         .limit(limit)
         .orderBy(idField, "ASC");
-    await writeImport(accountId, `rothschild-${tableName}-0`, res);
+    await writeDownload(accountId, `rothschild-${tableName}-live-0`, res);
     for (let pageIx = 1; res.length === limit; pageIx++) {
         res = await knex(tableName)
             .select()
@@ -63,7 +63,7 @@ async function pagedSqlDownload(accountId: string, knex: knex.Knex, tableName: s
             .where(idField, ">", res[limit - 1][idField])
             .limit(limit)
             .orderBy(idField, "ASC");
-        await writeImport(accountId, `rothschild-${tableName}-${pageIx}`, res);
+        await writeDownload(accountId, `rothschild-${tableName}-live-${pageIx}`, res);
     }
 
     let resTest = await knex(tableName)
@@ -71,7 +71,7 @@ async function pagedSqlDownload(accountId: string, knex: knex.Knex, tableName: s
         .where({userId: accountId + "-TEST"})
         .limit(limit)
         .orderBy(idField, "ASC");
-    await writeImport(accountId, `rothschild-${tableName}-test-0`, resTest);
+    await writeDownload(accountId, `rothschild-${tableName}-test-0`, resTest);
     for (let pageIx = 1; resTest.length === limit; pageIx++) {
         resTest = await knex(tableName)
             .select()
@@ -79,6 +79,6 @@ async function pagedSqlDownload(accountId: string, knex: knex.Knex, tableName: s
             .where(idField, ">", resTest[limit - 1][idField])
             .limit(limit)
             .orderBy(idField, "ASC");
-        await writeImport(accountId, `rothschild-${tableName}-test-${pageIx}`, resTest);
+        await writeDownload(accountId, `rothschild-${tableName}-test-${pageIx}`, resTest);
     }
 }

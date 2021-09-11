@@ -1,5 +1,5 @@
 import * as dynameh from "dynameh";
-import {writeImport} from "../utils/fileUtils";
+import {writeDownload} from "../utils/fileUtils";
 import {dynamodb} from "../utils/dynamodb";
 import {findDynamoTableName} from "../utils/findDynamoTable";
 
@@ -14,7 +14,11 @@ export async function downloadKvs(accountId: string): Promise<void> {
         sortKeyType: "string"
     };
 
-    const queryRequest = dynameh.requestBuilder.buildQueryInput(tableSchema, accountId);
-    const result = await dynameh.queryHelper.queryAll(dynamodb, queryRequest);
-    await writeImport(accountId, "kvs", result);
+    const req = dynameh.requestBuilder.buildQueryInput(tableSchema, accountId);
+    const res = await dynameh.queryHelper.queryAll(dynamodb, req);
+
+    const testReq = dynameh.requestBuilder.buildQueryInput(tableSchema, accountId + "-TEST");
+    const testRes = await dynameh.queryHelper.queryAll(dynamodb, testReq);
+
+    await writeDownload(accountId, "kvs", [...res, ...testRes]);
 }

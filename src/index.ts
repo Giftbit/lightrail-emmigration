@@ -1,32 +1,21 @@
-import yargs = require("yargs/yargs");
 import {download} from "./download";
+import {decrypt} from "./decrypt";
 
 main();
 
 async function main(): Promise<void> {
-    const args = await yargs(process.argv.slice(2))
-        .options("download", {
-            alias: "d",
-            boolean: true
-        })
-        .options("upload", {
-            alias: "u",
-            boolean: true,
-            conflicts: ["download"]
-        })
-        .options("userId", {
-            alias: "i",
-            required: true,
-            describe: "*account* userId",
-            string: true
-        })
-        .help()
-        .argv;
+    const command = process.argv[2];
+    const userId = process.argv[3];
 
-    if (args.download) {
-        await download(stripTest(args.userId));
-    } else if (args.upload) {
-        // await upload(stripeTestargs.userId));
+    switch (command) {
+        case "download":
+            await download(stripTest(userId));
+            break;
+        case "decrypt":
+            await decrypt(stripTest(userId));
+            break;
+        default:
+            throw new Error(`Unknown command '${command}'`);
     }
 }
 
