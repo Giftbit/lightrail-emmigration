@@ -38,6 +38,14 @@ export async function readDecrypt(accountId: string, filename: string): Promise<
     return JSON.parse(fileContents.toString("utf-8"));
 }
 
+export async function listDecrypts(accountId: string, prefix: string): Promise<any> {
+    const filepath = `./data/decrypt/${accountId}/`;
+    const files = await fs.promises.readdir(filepath);
+    return files
+        .filter(file => file.startsWith(prefix))
+        .map(file => path.basename(file, ".json"));
+}
+
 export async function writeEncrypt(accountId: string, filename: string, obj: any): Promise<void> {
     const filepath = `./data/encrypt/${accountId}/${filename}.json`;
     console.log("Writing", filepath);
