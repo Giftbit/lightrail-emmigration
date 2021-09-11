@@ -24,8 +24,16 @@ async function main(): Promise<void> {
         .argv;
 
     if (args.download) {
-        await download(args.userId);
+        await download(stripTest(args.userId));
     } else if (args.upload) {
-        // await upload(args.userId);
+        // await upload(stripeTestargs.userId));
     }
 }
+
+function stripTest(userId: string): string {
+    if (userId.endsWith("-TEST")) {
+        return userId.substr(0, userId.length - "-TEST".length);
+    }
+    return userId;
+}
+
