@@ -2,7 +2,7 @@ import knex = require("knex");
 import {askPassword} from "./commandLineInput";
 
 export async function connectToSqlDatabase(): Promise<knex.Knex> {
-    const username = "readonly";
+    const username = "master";
     const question = `Database ${username} password? `
     const pw = await askPassword(question);
     try {

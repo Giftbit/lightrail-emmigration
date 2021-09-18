@@ -33,4 +33,3 @@ function stripTest(userId: string): string {
     }
     return userId;
 }
-
