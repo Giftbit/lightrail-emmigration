@@ -2,9 +2,11 @@
   "name": "lightrail-emmigration",
   "version": "1.0.0",
   "description": "Script for migrating data off of Lightrail to a private instance",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
-    "start": "ts-node src/index"
+    "build": "npm run clean && tsc",
+    "clean": "rimraf build",
+    "start": "node build/"
   },
   "repository": {
     "type": "git",
@@ -17,6 +19,7 @@
   },
   "homepage": "https://github.com/Giftbit/lightrail-emmigration#readme",
   "dependencies": {
+    "@tsconfig/node14": "^1.0.1",
     "@types/crypto-js": "^4.0.2",
     "@types/mkdirp": "^1.0.2",
     "@types/mysql": "^2.15.19",
@@ -30,6 +33,7 @@
     "knex": "^0.95.11",
     "mkdirp": "^1.0.4",
     "mysql2": "^2.3.0",
+    "rimraf": "^3.0.2",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
   }

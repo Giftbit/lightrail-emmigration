@@ -40,7 +40,7 @@ async function encryptRoschildFilesParallel(accountId: string, encryptionSecret:
 }
 
 export async function encryptRothschildFile(accountId: string, encryptionSecret: string, lookupHashSecret: string, filename: string): Promise<void> {
-    const values: any[] = await readFile(accountId, "download", filename);
+    const values: any[] = await readFile(accountId, "decrypt", filename);
     for (const value of values) {
         if (value.codeDecrypted) {
             value.encrypted = encryptCode(value.codeDecrypted, encryptionSecret);
