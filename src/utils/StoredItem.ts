@@ -8,6 +8,8 @@ const kms = new aws.KMS({
 export interface StoredItem {
     encrypted?: boolean;
 
+    needsEncryption?: boolean; // for this script only
+
     /**
      * This is a legacy name.  We would call this `accountId` these days.
      * It's not exposed publicly and not worth the migration.
@@ -19,9 +21,12 @@ export interface StoredItem {
 
 
 export async function encryptStoredItem(storedItem: StoredItem, kmsKeyId: string): Promise<StoredItem> {
-    // if (storedItem.encrypted) {
-    //     throw new Error("StoredItem is already encrypted.");
-    // }
+    if (storedItem.encrypted) {
+        throw new Error("StoredItem is already encrypted.");
+    }
+    if (!storedItem.needsEncryption) {
+        throw new Error("StoredItem does not need encryption.");
+    }
 
     const encryptRes = await kms.encrypt({
         KeyId: kmsKeyId,
@@ -31,6 +36,7 @@ export async function encryptStoredItem(storedItem: StoredItem, kmsKeyId: string
     if (encryptRes.CiphertextBlob instanceof Buffer) {
         return {
             ...storedItem,
+            needsEncryption: undefined,
             encrypted: true,
             value: encryptRes.CiphertextBlob.toString("base64")
         };
@@ -49,7 +55,8 @@ export async function decryptStoredItem(storedItem: StoredItem, kmsKeyId: string
 
     return {
         ...storedItem,
-        encrypted: true,
+        needsEncryption: true,
+        encrypted: undefined,
         value: JSON.parse(decryptRes.Plaintext as string)
     };
 }

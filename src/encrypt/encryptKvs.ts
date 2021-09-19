@@ -6,7 +6,7 @@ export async function encryptKvs(accountId: string, kmsKeyId: string): Promise<v
 
     const storedItems: StoredItem[] = await readFile(accountId, "decrypt", "kvs");
     for (let i = 0; i < storedItems.length; i++) {
-        if (storedItems[i].encrypted) {
+        if (storedItems[i].needsEncryption) {
             storedItems[i] = await encryptStoredItem(storedItems[i], kmsKeyId);
         }
     }

@@ -43,7 +43,7 @@ export async function encryptRothschildFile(accountId: string, encryptionSecret:
     const values: any[] = await readFile(accountId, "decrypt", filename);
     for (const value of values) {
         if (value.codeDecrypted) {
-            value.encrypted = encryptCode(value.codeDecrypted, encryptionSecret);
+            value.codeEncrypted = encryptCode(value.codeDecrypted, encryptionSecret);
             value.codeHashed = computeCodeLookupHash(value.codeDecrypted, accountId, lookupHashSecret);
             delete value.codeDecrypted;
         }

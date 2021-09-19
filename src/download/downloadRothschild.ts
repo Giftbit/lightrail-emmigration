@@ -33,8 +33,7 @@ async function naiveSqlDownload(accountId: string, knex: knex.Knex, tableName: s
 async function pagedSqlDownload(accountId: string, knex: knex.Knex, tableName: string, idField = "id"): Promise<void> {
     console.log("Downloading", tableName);
 
-    // Empirically gets a number of records that can be uploaded back in one query.
-    const limit = 5000;
+    const limit = 10000;
 
     let res = await knex(tableName)
         .select()

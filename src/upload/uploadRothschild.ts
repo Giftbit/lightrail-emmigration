@@ -26,11 +26,16 @@ async function uploadTable(accountId: string, knex: knex.Knex, fileType: FileTyp
     const filenames = await listFiles(accountId, fileType, `rothschild-${tableName}`);
     for (const filename of filenames) {
         const contents: any[] = await readFile(accountId, fileType, filename);
-        if (contents.length > 0) {
-            await knex(tableName)
-                .insert(contents)
-                .onConflict()
-                .merge();
+        if (contents.length === 0) {
+            continue;
         }
+
+        // If this fails with ER_NET_PACKET_TOO_LARGE look into increasing
+        // max_allowed_packet.  67108864 (64 megs) should work.
+
+        await knex(tableName)
+            .insert(contents)
+            .onConflict()
+            .merge();
     }
 }
