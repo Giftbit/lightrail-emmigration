@@ -40,11 +40,7 @@ function getKnex(username: string, password: string, endpoint: string, port: str
                     }
                 }
                 if (field.type === "DATETIME") {
-                    const value = field.string();
-                    if (!value) {
-                        return null;
-                    }
-                    return new Date(value + "Z");
+                    return field.string();
                 }
                 return next();
             }
@@ -54,8 +50,4 @@ function getKnex(username: string, password: string, endpoint: string, port: str
             max: 1
         }
     });
-}
-
-export function formatDateForDB(date: Date): string {
-    return date.toISOString().split('T')[0]
 }

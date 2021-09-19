@@ -1,11 +1,9 @@
 import knex = require("knex");
-import {connectToSqlDatabase} from "../utils/sqlDatabase";
 import {FileType, listFiles, readFile} from "../utils/fileUtils";
 
-export async function uploadRothschild(accountId: string): Promise<void> {
-    console.log("Downloading Rothschild");
+export async function uploadRothschild(accountId: string, knex: knex.Knex): Promise<void> {
+    console.log("Uploading Rothschild");
 
-    const knex = await connectToSqlDatabase();
     await knex.raw("SET FOREIGN_KEY_CHECKS=0");
 
     await uploadTable(accountId, knex, "download", "Currencies");
@@ -20,14 +18,19 @@ export async function uploadRothschild(accountId: string): Promise<void> {
     await uploadTable(accountId, knex, "download", "TransactionChainBlockers");
 
     await knex.raw("SET FOREIGN_KEY_CHECKS=1");
-    await knex.destroy();
 }
 
 async function uploadTable(accountId: string, knex: knex.Knex, fileType: FileType,tableName: string): Promise<void> {
+    console.log("Uploading", tableName);
+
     const filenames = await listFiles(accountId, fileType, `rothschild-${tableName}`);
     for (const filename of filenames) {
         const contents: any[] = await readFile(accountId, fileType, filename);
-        await knex(tableName)
-            .insert(contents);
+        if (contents.length > 0) {
+            await knex(tableName)
+                .insert(contents)
+                .onConflict()
+                .merge();
+        }
     }
 }

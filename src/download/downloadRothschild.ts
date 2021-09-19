@@ -1,11 +1,9 @@
 import knex = require("knex");
-import {connectToSqlDatabase} from "../utils/sqlDatabase";
 import {writeFile} from "../utils/fileUtils";
 
-export async function downloadRothschild(accountId: string): Promise<void> {
+export async function downloadRothschild(accountId: string, knex: knex.Knex): Promise<void> {
     console.log("Downloading Rothschild");
 
-    const knex = await connectToSqlDatabase();
     await naiveSqlDownload(accountId, knex, "Currencies");
     await naiveSqlDownload(accountId, knex, "Programs");
     await naiveSqlDownload(accountId, knex, "Issuances");
@@ -16,8 +14,6 @@ export async function downloadRothschild(accountId: string): Promise<void> {
     await pagedSqlDownload(accountId, knex, "StripeTransactionSteps");
     await pagedSqlDownload(accountId, knex, "Transactions");
     await naiveSqlDownload(accountId, knex, "TransactionChainBlockers");
-
-    await knex.destroy();
 }
 
 async function naiveSqlDownload(accountId: string, knex: knex.Knex, tableName: string): Promise<void> {
@@ -37,7 +33,8 @@ async function naiveSqlDownload(accountId: string, knex: knex.Knex, tableName: s
 async function pagedSqlDownload(accountId: string, knex: knex.Knex, tableName: string, idField = "id"): Promise<void> {
     console.log("Downloading", tableName);
 
-    const limit = 20000;
+    // Empirically gets a number of records that can be uploaded back in one query.
+    const limit = 5000;
 
     let res = await knex(tableName)
         .select()

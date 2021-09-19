@@ -39,7 +39,7 @@ export async function downloadEdhi(accountId: string): Promise<void> {
 
     const userRes = (await Promise.all(getAccountUserIds(accountRes)
         .map(userId => {
-            const userQueryReq = dynameh.requestBuilder.buildQueryInput(tableSchema2, `User/${userId}`);
+            const userQueryReq = dynameh.requestBuilder.buildQueryInput(tableSchema2, `User/${userId}`, "=", `User/${userId}`);
             return dynameh.queryHelper.queryAll(dynamodb, userQueryReq);
         }))).flat();
 
