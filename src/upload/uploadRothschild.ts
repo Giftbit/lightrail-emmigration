@@ -33,9 +33,16 @@ async function uploadTable(accountId: string, knex: knex.Knex, fileType: FileTyp
         // If this fails with ER_NET_PACKET_TOO_LARGE look into increasing
         // max_allowed_packet.  67108864 (64 megs) should work.
 
-        await knex(tableName)
-            .insert(contents)
-            .onConflict()
-            .merge();
+        try {
+            await knex(tableName)
+                .insert(contents)
+                .onConflict()
+                .merge();
+        } catch (error) {
+            if ((error as any).code === "ER_NET_PACKET_TOO_LARGE") {
+                throw new Error(`Got ER_NET_PACKET_TOO_LARGE uploading to table ${tableName}. Try increasing the instance and cluster parameter max_allowed_packet.  67108864 (64 megs) should work.`);
+
+            }
+        }
     }
 }

@@ -3,7 +3,7 @@ import readline from "readline";
 /**
  * Prompt user for console input.
  */
-export async function askQuestion(question: string, allowedResults: string[] = []): Promise<string> {
+export async function askQuestion(question: string, allowedResults: string[] = [], allowedResultRegex?: RegExp): Promise<string> {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
@@ -16,7 +16,11 @@ export async function askQuestion(question: string, allowedResults: string[] = [
     })) as string;
     if (allowedResults.length > 1 && allowedResults.indexOf(result) === -1) {
         console.log("Invalid input...");
-        return await askQuestion(question, allowedResults) as string;
+        return askQuestion(question, allowedResults, allowedResultRegex);
+    }
+    if (allowedResultRegex && !allowedResultRegex.test(result)) {
+        console.log("Invalid input...");
+        return askQuestion(question, allowedResults, allowedResultRegex);
     }
     return result;
 }
@@ -24,7 +28,7 @@ export async function askQuestion(question: string, allowedResults: string[] = [
 /**
  * Prompt user for console input.
  */
-export async function askPassword(question: string, allowedResults: string[] = []): Promise<string> {
+export async function askPassword(question: string, allowedResultRegex?: RegExp): Promise<string> {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
@@ -44,9 +48,14 @@ export async function askPassword(question: string, allowedResults: string[] = [
     };
     process.stdin.on("keypress", keypressListener);
 
-    return await new Promise(resolve => rl.question(question, (ans: string) => {
+    const result = await new Promise<string>(resolve => rl.question(question, (ans: string) => {
         process.stdin.off("keypress", keypressListener);
         rl.close();
         resolve(ans);
-    })) as string;
+    }));
+    if (allowedResultRegex && !allowedResultRegex.test(result)) {
+        console.log("Invalid input...");
+        return askPassword(question, allowedResultRegex);
+    }
+    return result;
 }
