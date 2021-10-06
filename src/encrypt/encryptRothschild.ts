@@ -42,9 +42,12 @@ async function encryptRoschildFilesParallel(accountId: string, encryptionSecret:
 export async function encryptRothschildFile(accountId: string, encryptionSecret: string, lookupHashSecret: string, filename: string): Promise<void> {
     const values: any[] = await readFile(accountId, "decrypt", filename);
     for (const value of values) {
+        if (!value.userId.startsWith("user-")) {
+            throw new Error(`Value ${value.id} does not have a proper userId.`);
+        }
         if (value.codeDecrypted) {
             value.codeEncrypted = encryptCode(value.codeDecrypted, encryptionSecret);
-            value.codeHashed = computeCodeLookupHash(value.codeDecrypted, accountId, lookupHashSecret);
+            value.codeHashed = computeCodeLookupHash(value.codeDecrypted, value.userId, lookupHashSecret);
             delete value.codeDecrypted;
         }
     }
