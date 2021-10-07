@@ -4,9 +4,7 @@
   "description": "Script for migrating data off of Lightrail to a private instance",
   "main": "build/index.js",
   "scripts": {
-    "build": "npm run clean && tsc",
-    "clean": "rimraf build",
-    "start": "node build/"
+    "start": "ts-node src/index"
   },
   "repository": {
     "type": "git",
